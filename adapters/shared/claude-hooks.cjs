@@ -101,13 +101,19 @@ function allow() {
 // fully-qualified PreToolUse decision instead so the harness always parses it.
 // allow() is left unchanged for non-PreToolUse hooks (PostToolUse, Subagent*)
 // where the empty-object form remains accepted.
-function allowPreToolUse() {
-  console.log(JSON.stringify({
-    hookSpecificOutput: {
-      hookEventName: 'PreToolUse',
-      permissionDecision: 'allow',
-    },
-  }));
+// `additionalContext` (optional) MUST be a plain string — the PreToolUse schema
+// rejects objects, and a rejected payload is dropped whole, so any decision it
+// carried is lost (fail-open) while the user sees the validation error on every
+// tool call. Callers that want to surface data (e.g. the resolved tier) pass a
+// pre-formatted string here rather than hand-rolling their own JSON, so the
+// `permissionDecision` field can never be omitted by accident.
+function allowPreToolUse(additionalContext) {
+  const hookSpecificOutput = {
+    hookEventName: 'PreToolUse',
+    permissionDecision: 'allow',
+  };
+  if (additionalContext) hookSpecificOutput.additionalContext = String(additionalContext);
+  console.log(JSON.stringify({ hookSpecificOutput }));
   process.exit(0);
 }
 
@@ -2265,13 +2271,13 @@ function runPreToolUse() {
       });
       writeJson(pendingFile, pending);
 
-      console.log(JSON.stringify({
-        hookSpecificOutput: {
-          hookEventName: 'PreToolUse',
-          additionalContext: `\n\n---\n[Clawket] 작업 티켓: ${taskForAgent.ticket_number} — ${taskForAgent.title}\nTask ID: ${taskForAgent.id}`,
-        },
-      }));
-      process.exit(0);
+      // Same schema contract as the tier path below: PreToolUse requires
+      // `permissionDecision`, so route the ticket context through the helper
+      // rather than emitting a bare additionalContext payload (which the
+      // harness rejects wholesale, dropping the binding context).
+      allowPreToolUse(
+        `\n\n---\n[Clawket] 작업 티켓: ${taskForAgent.ticket_number || taskForAgent.id} — ${taskForAgent.title}\nTask ID: ${taskForAgent.id}`
+      );
     }
   }
 
@@ -2348,17 +2354,19 @@ function runPreToolUse() {
 
     // TIER-050: surface the resolved tier in CLAWKET_TIER_USED so downstream
     // model routing (and audit logs) can read which tier the gate accepted.
-    // The env is propagated to the current process AND emitted via the hook
-    // additionalContext.env channel so Claude Code can observe it.
+    // The env is propagated to the current process AND surfaced to Claude Code
+    // as an additionalContext line.
+    //
+    // This used to emit `additionalContext: { env: {...} }` with no
+    // `permissionDecision`, which is two schema violations at once: the field
+    // must be a string, and PreToolUse requires the decision. Claude Code
+    // rejected the whole payload with `Hook JSON output validation failed —
+    // (root): Invalid input` on every non-allowlisted Bash call, so the tier
+    // was never actually observable and users saw an error per command.
+    // Routing through allowPreToolUse() keeps the decision field mandatory.
     const tierUsed = (task && (task.tier_used || task.tier)) || 'med';
     process.env.CLAWKET_TIER_USED = String(tierUsed);
-    console.log(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: 'PreToolUse',
-        additionalContext: { env: { CLAWKET_TIER_USED: String(tierUsed) } },
-      },
-    }));
-    process.exit(0);
+    allowPreToolUse(`CLAWKET_TIER_USED=${tierUsed}`);
   }
 
   allowPreToolUse();
@@ -3136,6 +3144,9 @@ module.exports = {
   runUserPromptSubmit,
   // Exposed for test harnesses only.
   __test__: {
+    // Exposed so tests/pre-tool-use-schema.test.cjs can assert on the emitted
+    // payload directly, without needing a live daemon to reach an allow path.
+    allowPreToolUse,
     ensureCliBinary,
     ensureDaemonBinary,
     ensureWebBundle,
