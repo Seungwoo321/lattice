@@ -56,6 +56,7 @@ the tested combination here.
 | `3.1.14` | `>=0.2.0 <1.0.0` (pin: `v0.3.8`) | `>=0.2.0 <1.0.0` (pin: `v0.5.4`) | `>=0.1.0 <2.0.0` (pin: `v1.0.3`) | `>=3.0.0 <4.0.0` (pin: `null` — first release pending) | dropped (legacy MCP fully removed) |
 | `3.2.0` | `>=0.2.0 <1.0.0` (pin: `v0.4.0`) | `>=0.2.0 <1.0.0` (pin: `v0.6.0`) | `>=0.1.0 <2.0.0` (pin: `v1.0.3`) | `>=3.0.0 <4.0.0` (pin: `null` — first release pending) | dropped (legacy MCP fully removed) |
 | `3.2.1` | `>=0.2.0 <1.0.0` (pin: `v0.4.1`) | `>=0.2.0 <1.0.0` (pin: `v0.6.1`) | `>=0.1.0 <2.0.0` (pin: `v1.0.3`) | `>=3.0.0 <4.0.0` (pin: `null` — first release pending) | dropped (legacy MCP fully removed) |
+| `3.2.2` | `>=0.2.0 <1.0.0` (pin: `v0.4.1`) | `>=0.2.0 <1.0.0` (pin: `v0.6.1`) | `>=0.1.0 <2.0.0` (pin: `v1.0.3`) | `>=3.0.0 <4.0.0` (pin: `null` — first release pending) | dropped (legacy MCP fully removed) |
 
 Ranges are SemVer — a major bump in any component triggers a plugin major bump. Exact binary
 versions consumed by setup live in `components.json` (single SSoT — read directly rather than

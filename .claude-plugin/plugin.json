@@ -1,6 +1,6 @@
 {
   "name": "clawket",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "Structured task contracts for LLM coding agents — Claude Code plugin with local SQLite-backed task board + MCP RAG pull across sessions",
   "author": {
     "name": "Seungwoo Lee"

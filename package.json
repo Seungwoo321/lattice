@@ -1,7 +1,7 @@
 {
   "name": "clawket-plugin",
   "private": true,
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "Structured task contracts for LLM coding agents — Claude Code plugin shell for Clawket (hooks + prompts + skills); delegates runtime to @clawket/{cli,daemon,web}",
   "packageManager": "pnpm@10.33.4",
   "scripts": {
