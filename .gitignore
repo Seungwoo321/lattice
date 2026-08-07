@@ -32,3 +32,7 @@ desktop/dl/
 # bodies; markdown snapshots under plans/ are generated/regenerated via
 # `clawket plan export` and not tracked.
 plans/
+
+# Local review-gate artifacts (airpilot run-gate): per-HEAD reports, verdict
+# slots and the KPI log. Regenerated on every gate run, machine-specific.
+.airpilot/
