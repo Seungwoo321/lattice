@@ -102,6 +102,16 @@ install 로직. 어떤 새 코드 경로에서도 이 함수를 우회해 별도
 `components.json` 은 cross-repo 버전 핀의 정본. 핀을 bump 하면 다음 SessionStart
 에서 `ensureInstalled` 가 mismatch 를 감지하고 자동으로 새 바이너리를 받는다.
 
+**단, 사용자가 보는 것은 `main` 의 `components.json` 이 아니라 설치된 플러그인
+릴리즈 안의 사본이다.** 핀 bump PR 은 `chore:` 로 자동 생성되고 `chore:` 는
+release.yml 이 릴리즈로 인정하지 않으므로, 그 PR 을 머지하는 것만으로는
+사용자 환경에 아무것도 도달하지 않는다. 실제로 그런 일이 있었다 — daemon
+v0.5.0 과 cli v0.6.2 를 배포하고 두 핀 PR 을 머지했는데, 세 config 폴더 모두
+여전히 v0.4.1 / v0.6.1 을 쓰고 있었다.
+
+그러므로 컴포넌트 배포는 **플러그인 릴리즈까지가 한 단위**다. 핀 PR 머지 후
+`fix:` 커밋으로 플러그인 patch 를 내야 install gate 가 새 바이너리를 받는다.
+
 핀 변경 체크리스트:
 1. 대상 컴포넌트의 GitHub Release 가 `@clawket/{cli,daemon,web}` 에 실제로
    존재하는지 확인.
