@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "clawket",
-      "version": "3.2.2",
+      "version": "3.2.3",
       "source": "./",
       "description": "LLM-native work management dashboard for Claude Code — structured task board + MCP RAG pull tools across sessions"
     }
